@@ -2,15 +2,15 @@ const express = require('express')
 const app = express()
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors=require('cors')
+require('dotenv').config()
 const port =process.env.PORT || 5000
 app.use(cors())
 app.use(express.json())
-// lbhv0IvVWk6nM1kw
-// Job_Portal
+
 // ................
 
 
-const uri = `mongodb+srv://<db_username>:<db_password>@cluster0.zovp9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_User}:${process.env.DB_Pass}@cluster0.zovp9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -30,7 +30,7 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
