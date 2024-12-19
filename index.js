@@ -51,15 +51,24 @@ app.post('/job-application',async(req,res)=>{
   const result=await jobapplicationCollection.insertOne(application)
   res.send(result)
 })
+
+// to get all data
 app.get('/job-application',async(req,res)=>{
   const application=await jobapplicationCollection.find().toArray();
   res.json(application)
 
- 
 })
 
 
+// to get some  data
+app.get('/job-applicant',async(req,res)=>{
+  
+ const email=req.query.email;
+ const query={applicant_email:email}
+ const result=await jobapplicationCollection.find(query).toArray();
+ res.send(result)
 
+})
 
 
 
