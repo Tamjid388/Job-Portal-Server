@@ -66,11 +66,22 @@ app.get('/job-applicant',async(req,res)=>{
  const email=req.query.email;
  const query={applicant_email:email}
  const result=await jobapplicationCollection.find(query).toArray();
+ for(let application of result){
+  console.log(application.job_id);
+  const query1={_id:new ObjectId(application.job_id)}
+  const job=await jobscollection.findOne(query1)
+  if(job){
+    application.title=job.title;
+    application.company=job.company
+    application.company_logo=job.company_logo
+    application.location=job.location
+  }
+ }
  res.send(result)
 
 })
 
-
+// http://localhost:5000/job-applicant?email=ahmed15-4895@diu.edu.bd
 
 
   } finally {
