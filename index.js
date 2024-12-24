@@ -45,6 +45,21 @@ const jobapplicationCollection=client.db('Job-Portal').collection("job_applicati
     const result=await jobscollection.findOne(query)
     res.send(result)
  })
+
+//  Create Jobs...
+app,post('/jobs',async(req,res)=>{
+const newJob=req.body;
+const result=await jobscollection.insertOne(newJob)
+res.send(result)
+
+
+
+}
+
+)
+
+
+
 //  Job Application APi
 app.post('/job-application',async(req,res)=>{
   const application=req.body
