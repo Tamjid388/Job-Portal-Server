@@ -68,7 +68,26 @@ res.send(result)
 //  Job Application APi
 app.post('/job-application',async(req,res)=>{
   const application=req.body
-  const result=await jobapplicationCollection.insertOne(application)
+  const result=await jobapplicationCollection.insertOne(application);
+
+  const id=application.job_id;
+  const query={_id:new ObjectId(id)}
+  const job=await jobscollection.findOne(query)
+  let newcount=0;
+  if(job.applicationcount){
+    newcount=job.applicationcount+1
+  }else{
+    newcount=1
+  }
+  const filter={_id:new ObjectId(id)}
+  const updatedDoc={
+    $set:{
+      applicationcount:newcount
+    }
+  }
+  const updateResult=await jobscollection.updateOne(filter,updatedDoc)
+
+
   res.send(result)
 })
 
@@ -78,6 +97,23 @@ app.get('/job-application',async(req,res)=>{
   res.json(application)
 
 })
+
+// get a specefic job application by id
+app.get('/job-application/job/:job_id',async(req,res)=>{
+  const jobid=req.params.job_id;
+  const query={job_id:jobid}
+  const result=await jobapplicationCollection.find(query).toArray()
+  res.send(result)
+
+
+
+})
+
+
+
+
+
+
 
 
 // to get some  data
