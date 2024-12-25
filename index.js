@@ -108,7 +108,20 @@ app.get('/job-application/job/:job_id',async(req,res)=>{
 
 
 })
+app.patch('/job-application/:id',async(req,res)=>{
+ const id =req.params.id;
+ const data=req.body
+ const filter={_id:new ObjectId(id)}
+ const updatedDoc={
+  $set:{
+    status:data.status
+  }
+ }
+ const result=await jobapplicationCollection.updateOne(filter,updatedDoc)
+ res.send(result)
 
+
+})
 
 
 
