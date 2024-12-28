@@ -3,10 +3,42 @@ const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const jwt =require('jsonwebtoken')
+const cookieParser=require('cookie-parser')
 require("dotenv").config();
 const port = process.env.PORT || 5000;
-app.use(cors());
+app.use(cors({
+origin:['http://localhost:5173'],
+credentials:true
+
+}));
 app.use(express.json());
+app.use(cookieParser())
+
+
+
+//Custom Middleware
+const logger=(req,res,next)=>{
+console.log("inside the logger");
+next()
+}
+const verifyToken=(req,res,next)=>{
+  console.log("Inside verify token middleware");
+  const token=req?.cookies?.token
+if(!token){
+  return req.status(401).send({messege:"Unothorized Access"}) //401 mean Unothorized
+
+}
+jwt.verify(token.process.env.JWT_Secret,(error,decode)=>{
+  if(error){
+    return res.status(401).
+  }
+})
+
+
+  next()
+}
+
+
 
 // ................
 
@@ -42,11 +74,16 @@ async function run() {
 
 
 
-    // Auth Related
+    // Auth Related..Json Web Token
       app.post('/jwt',async(req,res)=>{
         const user=req.body
-        const token= jwt.sign(user,'secret',{expiresIn:'1h'})
-        res.send(token)
+        const token= jwt.sign(user,process.env.JWT_Secret,{expiresIn:'6h'})
+        res
+        .cookie('token',token,{
+          httpOnly:true,
+          secure:false
+        })
+        .send({success:true})
       })
     // ............
 
@@ -65,6 +102,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+
     app.get("/jobs/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -106,7 +144,9 @@ async function run() {
 
     // to get all data
     app.get("/job-application", async (req, res) => {
+     
       const application = await jobapplicationCollection.find().toArray();
+      
       res.json(application);
     });
 
@@ -138,6 +178,8 @@ async function run() {
     app.get("/job-applicant", async (req, res) => {
       const email = req.query.email;
       const query = { applicant_email: email };
+      // console.log("Cookies:", req.cookies);   //COOKIES
+
       const result = await jobapplicationCollection.find(query).toArray();
       for (let application of result) {
         console.log(application.job_id);
@@ -153,7 +195,7 @@ async function run() {
       res.send(result);
     });
 
-    // http://localhost:5000/job-applicant?email=ahmed15-4895@diu.edu.bd
+    
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
